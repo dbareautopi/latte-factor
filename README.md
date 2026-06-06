@@ -9,6 +9,8 @@ Monorepo con frontend y backend separados.
 │   └── AGENTS.md      # Guía de estructura y convenciones
 ├── backend/           # Go — DDD Hexagonal Architecture
 │   └── AGENTS.md      # Guía de estructura y convenciones
+├── contracts/         # Contratos de endpoints agrupados por dominio
+│   └── README.md      # Convenciones para definir contratos
 └── README.md
 ```
 
@@ -35,3 +37,4 @@ Ambas carpetas siguen [Conventional Commits](https://www.conventionalcommits.org
 
 - [Frontend](frontend/AGENTS.md) — Angular
 - [Backend](backend/AGENTS.md) — Go DDD Hexagonal
+- [Contracts](contracts/README.md) — Contratos de endpoints
