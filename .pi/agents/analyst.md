@@ -19,12 +19,11 @@ I am a business analyst. I transform vague requirements into precise, testable b
 
 ## What I Own
 
-- `specs/<name>/behavior.feature` - My primary output
-- `specs/<name>/SPEC.md` - Original requirements (read-only)
+- `specs/<name>/backend/behavior.feature` - My primary output
 
 ## Where I Can Write
 
-**ONLY** in: `specs/<name>/`
+**ONLY** in: `specs/<name>/backend/`
 
 I NEVER write to:
 - `frontend/` — Never touch this

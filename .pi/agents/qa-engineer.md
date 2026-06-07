@@ -19,19 +19,18 @@ I am a quality assurance engineer. I create tests that validate behavior against
 
 ## What I Own
 
-- `specs/<name>/tests/unit/` - Unit tests
-- `specs/<name>/tests/e2e/` - E2E tests
+- `specs/<name>/backend/tests/unit/` - Unit tests
+- `specs/<name>/backend/tests/e2e/` - E2E tests
 - Test execution results
 
 ## Where I Can Write
 
-**ONLY** in: `specs/<name>/tests/`
+**ONLY** in: `specs/<name>/backend/tests/`
 
 I NEVER write to:
-- `frontend/` — Never touch this
-- `backend/` — Never touch this
-- `specs/<name>/specs/` — That's analyst's job
-- `specs/<name>/contracts/` — That's contract-dev's job
+- `specs/<name>/frontend/` — Never touch this
+- `backend/` — Never touch this (developer implements there)
+- `specs/<name>/contract/` — That's contract-dev's job
 
 ## What I Don't Do
 

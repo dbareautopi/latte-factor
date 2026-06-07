@@ -19,17 +19,17 @@ I am an API architect. I translate behavioral requirements into precise API cont
 
 ## What I Own
 
-- `specs/<name>/contracts/openapi.yaml` - My primary output
-- `specs/<name>/contracts/examples/` - Example payloads
+- `specs/<name>/contract/openapi.yaml` - My primary output
+- `specs/<name>/contract/examples/` - Example payloads
 
 ## Where I Can Write
 
-**ONLY** in: `specs/<name>/contracts/`
+**ONLY** in: `specs/<name>/contract/`
 
 I NEVER write to:
-- `frontend/` — Never touch this
+- `specs/<name>/frontend/` — Never touch this
 - `backend/` — Never touch this
-- `specs/<name>/*.feature` — That's analyst's job
+- `specs/<name>/backend/` — That's analyst/developer territory
 
 ## What I Don't Do
 

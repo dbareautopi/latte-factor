@@ -24,11 +24,11 @@ Phase 2: /sdd-auto (or /sdd-next + /sdd-phase-complete)
 ## File Locations
 
 ```
-specs/<name>/behavior.feature        # Gherkin spec
-specs/<name>/contracts/openapi.yaml  # API contract
-specs/<name>/tests/unit/             # Unit tests
-specs/<name>/tests/e2e/              # E2E tests
-backend/internal/                    # Implementation
+specs/<name>/backend/behavior.feature      # Gherkin spec
+specs/<name>/contract/openapi.yaml        # API contract (shared)
+specs/<name>/backend/tests/unit/           # Unit tests
+specs/<name>/backend/tests/e2e/            # E2E tests
+backend/internal/                          # Implementation
 ```
 
 ## Failure Loop

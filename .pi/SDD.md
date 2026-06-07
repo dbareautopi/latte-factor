@@ -84,7 +84,7 @@ This creates:
 ```
 specs/expense-tracking/
 ├── behavior.feature        # (empty, you'll fill this)
-├── contracts/
+├── contract/
 │   └── examples/
 │       ├── requests/
 │       └── responses/
@@ -197,7 +197,7 @@ If tests fail:
 
 | Phase | Agent | Input | Output |
 |-------|-------|-------|--------|
-| contract | contract-dev | Gherkin | `contracts/openapi.yaml` |
+| contract | contract-dev | Gherkin | `contract/openapi.yaml` |
 | unit-tests | qa-engineer | Gherkin + Contract | `tests/unit/*.test.ts` |
 | e2e-tests | qa-engineer | Gherkin + Contract | `tests/e2e/*.e2e.test.ts` |
 | implementation | developer | Contract + Tests | Code in `backend/internal/` |
@@ -212,7 +212,7 @@ If tests fail:
 specs/
 └── expense-tracking/
     ├── behavior.feature              # Your Gherkin spec
-    ├── contracts/
+    ├── contract/
     │   ├── openapi.yaml              # API contract
     │   └── examples/
     │       ├── requests/
@@ -238,7 +238,7 @@ backend/
 ```
 specs/expense-tracking/
 ├── behavior.feature              # ✅ Source of truth
-├── contracts/
+├── contract/
 │   └── openapi.yaml              # ✅ Interface contract
 └── tests/                        # ✅ Test definitions
 
@@ -250,7 +250,7 @@ backend/internal/                 # ✅ Working implementation
 | Agent | Responsibility | Can Write To |
 |-------|---------------|--------------|
 | analyst | Create Gherkin specs | `specs/<name>/` |
-| contract-dev | Create OpenAPI contracts | `specs/<name>/contracts/` |
+| contract-dev | Create OpenAPI contracts | `specs/<name>/contract/` |
 | qa-engineer | Create and run tests | `specs/<name>/tests/` |
 | developer | Implement code | `backend/internal/` |
 | reviewer | Review code quality | (read-only) |

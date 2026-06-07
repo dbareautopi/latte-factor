@@ -76,12 +76,16 @@ export default function (pi: ExtensionAPI) {
         return;
       }
 
-      fs.mkdirSync(featureDir, { recursive: true });
-      fs.mkdirSync(path.join(featureDir, "contracts"), { recursive: true });
-      fs.mkdirSync(path.join(featureDir, "contracts", "examples", "requests"), { recursive: true });
-      fs.mkdirSync(path.join(featureDir, "contracts", "examples", "responses"), { recursive: true });
-      fs.mkdirSync(path.join(featureDir, "tests", "unit"), { recursive: true });
-      fs.mkdirSync(path.join(featureDir, "tests", "e2e"), { recursive: true });
+      // Shared: contract
+      fs.mkdirSync(path.join(featureDir, "contract", "examples", "requests"), { recursive: true });
+      fs.mkdirSync(path.join(featureDir, "contract", "examples", "responses"), { recursive: true });
+      
+      // Backend: Gherkin + tests
+      fs.mkdirSync(path.join(featureDir, "backend", "tests", "unit"), { recursive: true });
+      fs.mkdirSync(path.join(featureDir, "backend", "tests", "e2e"), { recursive: true });
+      
+      // Frontend: reserved
+      fs.mkdirSync(path.join(featureDir, "frontend"), { recursive: true });
 
       currentState = {
         feature: featureName,
@@ -121,7 +125,7 @@ I'll refine your description into Gherkin scenarios. When you're happy, I'll sav
         return;
       }
 
-      const gherkinPath = path.join(currentState.featureDir, "behavior.feature");
+      const gherkinPath = path.join(currentState.featureDir, "backend", "behavior.feature");
       
       // User can provide Gherkin directly, or we ask pi to generate from context
       let gherkinContent: string;
@@ -136,13 +140,13 @@ I'll refine your description into Gherkin scenarios. When you're happy, I'll sav
       
       // Save placeholder - pi will fill in the actual content
       fs.writeFileSync(gherkinPath, gherkinContent);
-      ctx.ui.notify(`Spec saved: specs/${currentState.feature}/behavior.feature`, "success");
+      ctx.ui.notify(`Spec saved: specs/${currentState.feature}/backend/behavior.feature`, "success");
 
       pi.sendMessage({
         customType: "sdd-spec-saved",
         content: `## Spec Saved! ✅
 
-File: \`specs/${currentState.feature}/behavior.feature\`
+File: \`specs/${currentState.feature}/backend/behavior.feature\`
 
 ### Ready for Implementation
 
@@ -171,7 +175,7 @@ Or keep editing:
         return;
       }
 
-      const gherkinPath = path.join(currentState.featureDir, "behavior.feature");
+      const gherkinPath = path.join(currentState.featureDir, "backend", "behavior.feature");
       
       if (!fs.existsSync(gherkinPath)) {
         ctx.ui.notify("No spec yet. Use /sdd-save first.", "error");
@@ -213,7 +217,7 @@ Or paste a complete new spec with /sdd-save.`,
       }
 
       // Verify spec exists
-      const gherkinPath = path.join(currentState.featureDir, "behavior.feature");
+      const gherkinPath = path.join(currentState.featureDir, "backend", "behavior.feature");
       if (!fs.existsSync(gherkinPath)) {
         ctx.ui.notify("No spec found. Complete Phase 1 first with /sdd-save.", "error");
         return;
@@ -241,7 +245,7 @@ Or paste a complete new spec with /sdd-save.`,
       }
 
       // Verify spec exists
-      const gherkinPath = path.join(currentState.featureDir, "behavior.feature");
+      const gherkinPath = path.join(currentState.featureDir, "backend", "behavior.feature");
       if (!fs.existsSync(gherkinPath)) {
         ctx.ui.notify("No spec found. Complete Phase 1 first with /sdd-save.", "error");
         return;
@@ -266,8 +270,8 @@ Use the **subagent** tool to spawn the **contract-dev** agent.
 Task: Create OpenAPI contract for "${currentState.feature}"
 
 1. Read the Gherkin: ${gherkinPath}
-2. Create OpenAPI at: ${path.join(currentState.featureDir, "contracts", "openapi.yaml")}
-3. Create examples in: ${path.join(currentState.featureDir, "contracts", "examples")}
+2. Create OpenAPI at: ${path.join(currentState.featureDir, "contract", "openapi.yaml")}
+3. Create examples in: ${path.join(currentState.featureDir, "contract", "examples")}
 
 **IMPORTANT: When the contract agent finishes, immediately proceed to Phase 2 (unit tests) without waiting for user input.**
 
@@ -338,10 +342,10 @@ Task: Review code quality
 All phases completed successfully.
 
 ### Deliverables
-- Spec: \`specs/${currentState.feature}/behavior.feature\`
-- Contract: \`specs/${currentState.feature}/contracts/openapi.yaml\`
-- Tests: \`specs/${currentState.feature}/tests/\`
-- Implementation: Passing tests in \`backend/\``,
+- Spec: \`specs/${currentState.feature}/backend/behavior.feature\`
+- Contract: \`specs/${currentState.feature}/contract/openapi.yaml\`
+- Tests: \`specs/${currentState.feature}/backend/tests/\`
+- Implementation: Passing tests in \`backend/internal/\``,
           display: true,
         }, { deliverAs: "followUp" });
         return;
@@ -389,7 +393,7 @@ ${args || "No details provided."}
 \`\`\`
 
 Read:
-- Contract: ${path.join(currentState.featureDir, "contracts", "openapi.yaml")}
+- Contract: ${path.join(currentState.featureDir, "contract", "openapi.yaml")}
 - Tests: ${path.join(currentState.featureDir, "tests")}
 
 After fixing, use /sdd-phase-complete to continue.`,
@@ -465,10 +469,10 @@ Use the **subagent** tool to spawn the **qa-engineer** agent.
 Task: Create unit tests for "${feature}"
 
 Read:
-- Gherkin: ${path.join(dir, "behavior.feature")}
-- Contract: ${path.join(dir, "contracts", "openapi.yaml")}
+- Gherkin: ${path.join(dir, "backend", "behavior.feature")}
+- Contract: ${path.join(dir, "contract", "openapi.yaml")}
 
-Save to: ${path.join(dir, "tests", "unit")}
+Save to: ${path.join(dir, "backend", "tests", "unit")}
 
 When complete, use /sdd-phase-complete to continue.
 `,
@@ -481,10 +485,10 @@ Use the **subagent** tool to spawn the **qa-engineer** agent.
 Task: Create e2e tests for "${feature}"
 
 Read:
-- Gherkin: ${path.join(dir, "behavior.feature")}
-- Contract: ${path.join(dir, "contracts", "openapi.yaml")}
+- Gherkin: ${path.join(dir, "backend", "behavior.feature")}
+- Contract: ${path.join(dir, "contract", "openapi.yaml")}
 
-Save to: ${path.join(dir, "tests", "e2e")}
+Save to: ${path.join(dir, "backend", "tests", "e2e")}
 
 When complete, use /sdd-phase-complete to continue.
 `,
@@ -497,9 +501,9 @@ Use the **subagent** tool to spawn the **developer** agent.
 Task: Implement "${feature}" in Go
 
 Read:
-- Contract: ${path.join(dir, "contracts", "openapi.yaml")}
-- Unit tests: ${path.join(dir, "tests", "unit")}
-- E2E tests: ${path.join(dir, "tests", "e2e")}
+- Contract: ${path.join(dir, "contract", "openapi.yaml")}
+- Unit tests: ${path.join(dir, "backend", "tests", "unit")}
+- E2E tests: ${path.join(dir, "backend", "tests", "e2e")}
 
 Write code in: \`backend/internal/\`
 
@@ -530,7 +534,7 @@ Use the **subagent** tool to spawn the **reviewer** agent.
 Task: Review implementation for "${feature}"
 
 Review:
-- Contract: ${path.join(dir, "contracts", "openapi.yaml")}
+- Contract: ${path.join(dir, "contract", "openapi.yaml")}
 - Code in: \`backend/internal/\`
 
 If approved: use /sdd-phase-complete
