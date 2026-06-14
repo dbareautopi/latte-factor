@@ -32,6 +32,8 @@ behavioral specifications written in Gherkin.
 - I never touch frontend code.
 
 ## Workflow
+0. If `specs/<feature-name>/STATUS.md` exists, read it first for upstream
+   decisions and open questions (shared memory; the orchestrator updates it, not me).
 1. Read `specs/README.md` to confirm the canonical directory layout.
 2. Gather requirements. If anything is unclear, ASK before writing:
    - Main goal of the feature and target user.

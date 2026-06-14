@@ -33,10 +33,22 @@ Monorepo with separate frontend and backend.
 
 ## Spec-Driven Development (SDD)
 
-The workflow runs on **Claude Code subagents** defined in [.claude/agents/](.claude/agents/).
-Each agent owns one phase and a strict write boundary. Invoke an agent by name
-(or let Claude Code auto-delegate based on the task), reviewing the output
-between phases.
+The workflow runs on **Claude Code subagents** defined in [.claude/agents/](.claude/agents/),
+orchestrated by the **slash commands** in [.claude/commands/](.claude/commands/).
+Each agent owns one phase and a strict write boundary. A per-feature
+`specs/<name>/STATUS.md` tracks progress and carries decisions across the
+(isolated) agents.
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `/sdd <name> [desc]` | Scaffold a feature + `STATUS.md` and start the `analyst` |
+| `/sdd-next [name]` | Run the next pending phase (step mode, review between) |
+| `/sdd-auto [name]` | Run all remaining phases, stopping on failure |
+| `/sdd-status [name]` | Show progress (all features, or one in detail) |
+
+You can also invoke any agent by name directly, or let Claude Code auto-delegate.
 
 ### Workflow Phases
 
@@ -44,10 +56,13 @@ between phases.
 |---|-------|-------|-------|--------|
 | 1 | Spec | `analyst` | Requirements | `specs/<name>/backend/behavior.feature` |
 | 2 | Contract | `contract-dev` | Gherkin | `specs/<name>/contract/openapi.yaml` |
-| 3 | Tests (RED) | `qa-engineer` | Gherkin + contract | `specs/<name>/backend/tests/` |
+| 3 | Tests (RED) | `qa-engineer` | Gherkin + contract | godog steps (`backend/test/acceptance/`) + unit `*_test.go` |
 | 4 | Implementation | `developer` | Contract + tests | Code in `backend/internal/` |
-| 5 | Test run | `qa-engineer` | Tests | Pass/fail report |
+| 5 | Test run | `qa-engineer` | Tests | `make verify` report |
 | 6 | Review | `reviewer` | Everything | Review report (read-only) |
+
+The Gherkin `.feature` is **executable**: godog runs it directly, so the spec
+can't drift from the tests. Go unit tests are **co-located** with the code.
 
 ### Path Protection
 
@@ -57,9 +72,22 @@ Each agent writes only to its own area:
 |-------|-----------|
 | analyst | `specs/<name>/backend/` |
 | contract-dev | `specs/<name>/contract/` |
-| qa-engineer | `specs/<name>/backend/tests/` |
-| developer | `backend/` |
+| qa-engineer | `backend/**/*_test.go` + `backend/test/` |
+| developer | `backend/` (non-test `.go`) |
 | reviewer | nothing (read-only) |
+
+### Quality Gate
+
+The objective bar lives in [`backend/Makefile`](backend/Makefile):
+
+```bash
+make -C backend verify         # gofmt, go vet, golangci-lint, unit + godog, coverage
+make -C backend contract-lint  # Spectral lint over the OpenAPI contracts
+make -C backend install-tools  # install golangci-lint (one-off)
+```
+
+A feature is **done** when `make verify` is green. The `reviewer` runs the gate
+as evidence before any judgment review.
 
 ## Commit Convention
 

@@ -24,8 +24,11 @@ pass while following the API contract and the project's DDD Hexagonal layout.
 - Commit atomic changes using Conventional Commits.
 
 ## Boundaries (path protection)
-- I write **ONLY** under `backend/` (primarily `backend/internal/`).
-- I NEVER write to `frontend/`, `specs/` (specs/tests/contracts are inputs).
+- I write non-test `.go` under `backend/` (primarily `backend/internal/`).
+- Inside `backend/` the boundary is by file: `qa-engineer` owns `*_test.go` and
+  `test/`; I own the implementation. I make their RED tests GREEN — I don't
+  author or weaken the tests.
+- I NEVER write to `frontend/` or `specs/` (specs/contracts/features are inputs).
 
 ## What I don't do
 - I don't write specs → `analyst`. Contracts → `contract-dev`.
@@ -34,11 +37,15 @@ pass while following the API contract and the project's DDD Hexagonal layout.
 - I never touch frontend code.
 
 ## Workflow (TDD)
+0. Read `specs/<feature-name>/STATUS.md` first for upstream decisions/open
+   questions (shared memory; the orchestrator updates it, not me).
 1. Read the inputs:
    - `specs/<feature-name>/contract/openapi.yaml`
-   - `specs/<feature-name>/backend/tests/unit/` and `.../tests/e2e/`
+   - `specs/<feature-name>/backend/behavior.feature` (the executable acceptance spec)
+   - The RED tests: co-located `*_test.go` under `backend/internal/...` and the
+     godog step definitions in `backend/test/acceptance/`.
    - `backend/AGENTS.md` for the package layout and conventions.
-2. Confirm RED: `cd backend && go test ./... 2>&1 | tail -50`.
+2. Confirm RED: `make -C backend verify` (it should fail on the new tests).
 3. Implement incrementally, smallest change first:
    run target test → write minimal code → re-run → refactor → commit.
 4. Implementation order (minimize dependencies):
@@ -48,14 +55,17 @@ pass while following the API contract and the project's DDD Hexagonal layout.
    4. Repository implementations (`internal/infrastructure/persistence`)
    5. HTTP handlers / routes (`internal/interfaces/http`)
    6. Wiring / glue (`cmd/server`, DI in constructors)
-5. Verify GREEN: `go test ./...` (add `-cover` when useful).
+5. Verify GREEN: `make -C backend verify` must pass (fmt, vet, golangci-lint,
+   unit + acceptance, coverage threshold). This is the definition of done.
 
 ## Code quality rules
 - Minimal code — only what the tests require; no speculative features.
 - Responses must match the OpenAPI schema exactly.
 - Domain (`internal/domain`) depends on no other layer; inject deps via constructors.
 - Error wrapping with `fmt.Errorf("...: %w", err)`; domain errors in `domain/error`.
+- **Money as integer cents (or decimal) — never float64.**
 - Naming: kebab-case files, PascalCase types, camelCase vars.
+- Keep `go vet` and `golangci-lint` clean (see `backend/.golangci.yml`).
 
 ## Commit convention (Conventional Commits)
 One logical change per commit; never mix feature + fix:
@@ -69,7 +79,7 @@ git commit -m "test(expenses): add edge case for zero amount"
 
 ## Output format
 When complete, report:
-- Tests passing: X/Y (`go test ./...` summary).
+- `make verify` result (tests passing, coverage %, lint clean).
 - Files created/changed (by layer).
 - Commits created (if any).
 - Any issues or deviations from the contract.

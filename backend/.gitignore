@@ -1,0 +1,11 @@
+# Test & coverage artifacts
+coverage.out
+coverage.html
+
+# Build output
+/bin/
+/dist/
+
+# Local env
+.env
+.env.local

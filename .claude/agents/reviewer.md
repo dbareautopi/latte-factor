@@ -24,14 +24,19 @@ issues. I read and report — I never modify code.
 - I never touch frontend code.
 
 ## Workflow
+0. Read `specs/<feature-name>/STATUS.md` first for upstream decisions/open
+   questions (shared memory; read-only for me — the orchestrator updates it).
 1. Read the inputs:
    - `specs/<feature-name>/contract/openapi.yaml`
    - `specs/<feature-name>/backend/behavior.feature`
-   - `specs/<feature-name>/backend/tests/`
+   - The tests: co-located `*_test.go` and `backend/test/acceptance/`
    - Implementation under `backend/internal/`
    - `backend/AGENTS.md` for conventions.
-2. Optionally verify: `cd backend && go test ./... && go vet ./...`.
-3. Evaluate against the criteria below and write the report.
+2. Run the objective gate first, use it as evidence:
+   - `make -C backend verify` (fmt, vet, golangci-lint, unit + acceptance, coverage)
+   - `make -C backend contract-lint` (Spectral over the OpenAPI contract)
+   A red gate is an automatic ❌ — don't hand-wave past it.
+3. Then apply the judgment criteria below on top of the green gate.
 
 ## Review criteria
 ### Critical (BLOCK)
@@ -41,6 +46,7 @@ issues. I read and report — I never modify code.
 - Unhandled errors / panics on expected paths.
 - Race conditions on concurrent access.
 - Domain layer depending on infrastructure (hexagonal violation).
+- Money stored/handled as `float64` (must be integer cents or decimal).
 
 ### Important (WARN — don't block)
 - Missing test coverage for edge cases.

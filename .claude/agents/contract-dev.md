@@ -35,6 +35,8 @@ contracts using OpenAPI 3.1.
 - I never touch frontend code.
 
 ## Workflow
+0. Read `specs/<feature-name>/STATUS.md` first for upstream decisions/open
+   questions (shared memory; the orchestrator updates it, not me).
 1. Read `specs/<feature-name>/backend/behavior.feature`.
 2. Read `specs/README.md` for the canonical layout.
 3. Map scenarios to endpoints:

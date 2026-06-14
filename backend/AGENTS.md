@@ -31,11 +31,34 @@ internal/
     └── grpc/                # (opcional) handlers gRPC
 pkg/                         # Código reutilizable y público
 scripts/                     # Scripts de utilidad (migrations, etc.)
-tests/                       # Tests integration / e2e
+test/
+└── acceptance/              # Step definitions godog (ejecutan specs/*/backend/*.feature)
 go.mod
 go.sum
 Makefile
+.golangci.yml
 ```
+
+## Testing
+
+- **Unit (Testify):** co-localizados con el código — `internal/domain/model/expense_test.go`
+  junto a `expense.go`. Obligatorio: los paquetes `internal/` solo se importan
+  desde dentro de `backend/`.
+- **Aceptación (godog):** los `.feature` de `specs/<feature>/backend/` se ejecutan
+  directamente; las step definitions viven en `test/acceptance/`. El Gherkin ES
+  el test, no se transcribe a mano.
+- **Dinero:** siempre enteros en céntimos (o decimal), nunca `float64`.
+
+## Quality gate (`make verify`)
+
+| Target | Qué hace |
+|--------|----------|
+| `make verify` | gofmt + `go vet` + golangci-lint + unit + godog + cobertura |
+| `make acceptance` | solo los tests godog |
+| `make contract-lint` | Spectral sobre `specs/*/contract/openapi.yaml` |
+| `make install-tools` | instala golangci-lint en `$(go env GOPATH)/bin` |
+
+Una feature está **terminada** cuando `make verify` está en verde.
 
 ## Principios
 

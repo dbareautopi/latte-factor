@@ -1,0 +1,41 @@
+version: "2"
+
+run:
+  timeout: 5m
+
+linters:
+  default: none
+  enable:
+    - errcheck       # unchecked errors
+    - govet          # suspicious constructs
+    - ineffassign    # ineffectual assignments
+    - staticcheck    # broad correctness/simplification set
+    - unused         # unused code
+    - bodyclose      # unclosed HTTP response bodies
+    - errorlint      # correct error wrapping/comparison
+    - gosec          # security issues (secrets, sqli, etc.)
+    - misspell       # typos in comments/strings
+    - revive         # style/lint (replacement for golint)
+    - unconvert      # redundant type conversions
+  settings:
+    revive:
+      rules:
+        - name: exported
+          disabled: false
+  exclusions:
+    generated: lax
+    rules:
+      # Tests may use weaker rng / unchecked errors in fixtures.
+      - path: _test\.go
+        linters:
+          - gosec
+          - errcheck
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/dbareautopi/latte-factor

@@ -1,0 +1,18 @@
+# Spectral ruleset for the SDD OpenAPI contracts (specs/<feature>/contract/openapi.yaml).
+# Run via `make contract-lint` from backend/ (uses npx @stoplight/spectral-cli).
+extends:
+  - "spectral:oas"
+
+rules:
+  # The contract is the shared FE/BE source of truth — be strict about the
+  # things our agents rely on (stable operationIds, tags, examples, docs).
+  operation-operationId: error
+  operation-operationId-unique: error
+  operation-tag-defined: error
+  operation-description: warn
+  operation-success-response: error
+  oas3-valid-media-example: error
+  oas3-valid-schema-example: error
+  no-$ref-siblings: error
+  info-contact: off
+  oas3-unused-component: warn
