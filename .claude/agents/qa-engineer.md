@@ -68,6 +68,9 @@ report results.
 | Scenario Outline   | parametrized step           | table-driven `[]struct{}`   |
 
 ## godog step definition shape
+Prefer the **generated typed client** (`internal/interfaces/http/<pkg>`,
+`NewClientWithResponses`) to drive the API in `When` steps — the e2e calls then
+use the contract's types, so a contract change surfaces here too.
 ```go
 // backend/test/acceptance/expense_steps.go
 package acceptance
@@ -75,7 +78,7 @@ package acceptance
 import "github.com/cucumber/godog"
 
 func (w *world) iAddAnExpense(amount string, desc string) error {
-    // call the real handler/service; store result on w
+    // call the API via the generated client (or the wired handler); store result on w
     return nil
 }
 

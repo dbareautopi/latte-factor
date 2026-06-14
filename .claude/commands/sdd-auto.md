@@ -11,8 +11,10 @@ ask if ambiguous). Set **Mode: auto** in STATUS.md.
 
 ## Loop
 Run phases in order from the first non-`✅` phase, using the same phase→subagent
-mapping, RED check, and feedback loops as `/sdd-next`. After each phase, update
-STATUS.md (status, Current phase, Decision log, Open questions) before continuing.
+mapping, RED check, and feedback loops as `/sdd-next` — including the **2b codegen**
+step (`make -C backend generate` + commit the `*.gen.go`) after the contract and
+before tests. After each phase, update STATUS.md (status, Current phase, Decision
+log, Open questions) before continuing.
 
 Each subagent runs isolated — always tell it to read `specs/<name>/STATUS.md`
 first so upstream decisions carry across phases.

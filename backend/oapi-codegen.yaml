@@ -1,0 +1,9 @@
+# Shared oapi-codegen settings for the SDD contracts.
+# package / output / input spec are passed per feature by `make generate`.
+generate:
+  models: true
+  chi-server: true
+  strict-server: true
+  client: true
+output-options:
+  skip-prune: false

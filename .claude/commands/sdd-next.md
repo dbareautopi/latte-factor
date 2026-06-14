@@ -20,7 +20,8 @@ decisions / open questions. Stop and report after this single phase.
 | Phase | Subagent | Action | Done when |
 |-------|----------|--------|-----------|
 | 1 Spec | `analyst` | Write `behavior.feature` | Gherkin saved |
-| 2 Contract | `contract-dev` | Write `openapi.yaml` + examples | contract covers every scenario |
+| 2 Contract | `contract-dev` | Write `openapi.yaml` (3.0.3) + examples | contract covers every scenario |
+| 2b Codegen | _(orchestrator, no agent)_ | Run `make -C backend generate`, commit the `*.gen.go` | generated chi server compiles |
 | 3 Tests (RED) | `qa-engineer` | godog steps + co-located unit tests | `make -C backend verify` fails **on the new tests** (RED confirmed) |
 | 4 Implementation | `developer` | Implement in `backend/internal/` | code written, aiming for GREEN |
 | 5 Test run | `qa-engineer` | Run `make -C backend verify` | gate is GREEN |

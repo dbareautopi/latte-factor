@@ -51,6 +51,7 @@ This project is **backend-only** for SDD — never scaffold or touch `frontend/`
 |---|-------|-------|--------|----------|
 | 1 | Spec | analyst | 🔄 in-progress | `specs/<name>/backend/behavior.feature` |
 | 2 | Contract | contract-dev | ⬜ pending | `specs/<name>/contract/openapi.yaml` |
+| 2b | Codegen | _(make generate)_ | ⬜ pending | `backend/internal/interfaces/http/<pkg>/api.gen.go` |
 | 3 | Tests (RED) | qa-engineer | ⬜ pending | `backend/test/acceptance/` + `backend/internal/**/*_test.go` |
 | 4 | Implementation | developer | ⬜ pending | `backend/internal/...` |
 | 5 | Test run | qa-engineer | ⬜ pending | `make -C backend verify` |

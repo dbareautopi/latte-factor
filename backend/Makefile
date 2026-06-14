@@ -13,21 +13,43 @@ SPECS_DIR      := ../specs
 SPECTRAL_RULES := ../.spectral.yaml
 COVER_PROFILE  := coverage.out
 COVER_MIN      ?= 70
+OAPI_CONFIG    := oapi-codegen.yaml
+GEN_DIR        := internal/interfaces/http
 
 .DEFAULT_GOAL := help
-.PHONY: help verify fmt vet lint unit acceptance test cover contract-lint mod-verify tidy install-tools
+.PHONY: help verify fmt vet lint unit acceptance test cover contract-lint generate generate-check mod-verify tidy install-tools
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort \
 		| awk 'BEGIN {FS=":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
 
-verify: mod-verify fmt vet lint test cover ## Full Go quality gate (fmt, vet, lint, tests, coverage)
+verify: mod-verify generate-check fmt vet lint test cover ## Full Go quality gate (codegen drift, fmt, vet, lint, tests, coverage)
 
 mod-verify: ## Verify module dependencies are intact
 	$(GO) mod verify
 
 tidy: ## Tidy go.mod / go.sum
 	$(GO) mod tidy
+
+generate: ## Generate chi server + typed client from each OpenAPI contract
+	@found=0; \
+	for spec in $(SPECS_DIR)/*/contract/openapi.yaml; do \
+		[ -e "$$spec" ] || continue; found=1; \
+		feat=$$(basename $$(dirname $$(dirname $$spec))); \
+		pkg=$$(printf '%s' "$${feat//[-_]/}" | tr '[:upper:]' '[:lower:]'); \
+		out=$(GEN_DIR)/$$pkg; mkdir -p $$out; \
+		echo "generate: $$feat -> $$out/api.gen.go"; \
+		$(GO) tool oapi-codegen -config $(OAPI_CONFIG) -package $$pkg -o $$out/api.gen.go $$spec || exit 1; \
+	done; \
+	[ $$found -eq 1 ] || echo "no contracts to generate yet"
+
+generate-check: generate ## Fail if generated code is stale or uncommitted
+	@changes=$$(git status --porcelain -- $(GEN_DIR) 2>/dev/null); \
+	if [ -n "$$changes" ]; then \
+		echo "generated code is stale or uncommitted — run 'make generate' and commit:"; \
+		echo "$$changes"; exit 1; \
+	fi; \
+	echo "generated code: up to date"
 
 fmt: ## Fail if any file needs gofmt
 	@out=$$(gofmt -l . 2>/dev/null); \

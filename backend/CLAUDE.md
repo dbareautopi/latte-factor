@@ -55,10 +55,25 @@ r.Route("/api/v1", func(r chi.Router) {
 })
 ```
 
-> **Futuro (#4):** el servidor chi (interfaz + tipos) se **generará** desde
-> `specs/<feature>/contract/openapi.yaml` con oapi-codegen (target `chi-server`),
-> de modo que el handler no compile si no cumple el contrato. Hasta entonces se
-> escribe a mano siguiendo el contrato.
+## Codegen del contrato (oapi-codegen)
+
+El servidor chi **se genera** desde `specs/<feature>/contract/openapi.yaml`, no se
+escribe a mano. `make generate` produce, por cada contrato:
+
+- Carpeta `internal/interfaces/http/<pkg>/api.gen.go` (`<pkg>` = nombre de la
+  feature sin guiones; p. ej. `expense-tracking` → paquete `expensetracking`).
+- **Tipos** de request/response · **`StrictServerInterface`** (handlers tipados)
+  · **`HandlerFromMux`** (montaje en chi) · **cliente** tipado (para godog).
+
+Reglas:
+- El `developer` **implementa `StrictServerInterface`**; si el contrato cambia y
+  la implementación no lo cumple, **no compila** (conformidad en compile-time).
+- **Nunca** editar a mano los `*.gen.go` (`DO NOT EDIT`). Cambiar el contrato →
+  `make generate` → commit. `make verify` falla si el generado está desfasado
+  (drift check) o sin commitear.
+- Config compartida en `oapi-codegen.yaml`; oapi-codegen va pineado como *tool*
+  en `go.mod` (`go tool oapi-codegen`).
+- Contratos en **OpenAPI 3.0.3** (oapi-codegen no soporta 3.1 del todo).
 
 ## Testing
 
@@ -73,7 +88,8 @@ r.Route("/api/v1", func(r chi.Router) {
 
 | Target | Qué hace |
 |--------|----------|
-| `make verify` | gofmt + `go vet` + golangci-lint + unit + godog + cobertura |
+| `make verify` | codegen drift + gofmt + `go vet` + golangci-lint + unit + godog + cobertura |
+| `make generate` | genera servidor chi + cliente desde cada contrato |
 | `make acceptance` | solo los tests godog |
 | `make contract-lint` | Spectral sobre `specs/*/contract/openapi.yaml` |
 | `make install-tools` | instala golangci-lint en `$(go env GOPATH)/bin` |

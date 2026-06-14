@@ -59,14 +59,17 @@ You can also invoke any agent by name directly, or let Claude Code auto-delegate
 | # | Phase | Agent | Input | Output |
 |---|-------|-------|-------|--------|
 | 1 | Spec | `analyst` | Requirements | `specs/<name>/backend/behavior.feature` |
-| 2 | Contract | `contract-dev` | Gherkin | `specs/<name>/contract/openapi.yaml` |
+| 2 | Contract | `contract-dev` | Gherkin | `specs/<name>/contract/openapi.yaml` (3.0.3) |
+| 2b | Codegen | `make generate` | Contract | typed chi server `backend/internal/interfaces/http/<pkg>/api.gen.go` |
 | 3 | Tests (RED) | `qa-engineer` | Gherkin + contract | godog steps (`backend/test/acceptance/`) + unit `*_test.go` |
-| 4 | Implementation | `developer` | Contract + tests | Code in `backend/internal/` |
+| 4 | Implementation | `developer` | Contract + generated iface + tests | Code in `backend/internal/` |
 | 5 | Test run | `qa-engineer` | Tests | `make verify` report |
 | 6 | Review | `reviewer` | Everything | Review report (read-only) |
 
-The Gherkin `.feature` is **executable**: godog runs it directly, so the spec
-can't drift from the tests. Go unit tests are **co-located** with the code.
+Two things keep the spec, contract and code from drifting: the Gherkin `.feature`
+is **executable** (godog runs it directly), and the chi server is **generated**
+from the OpenAPI contract (oapi-codegen) — so a handler that doesn't match the
+contract won't compile. Go unit tests are **co-located** with the code.
 
 ### Path Protection
 
@@ -85,7 +88,8 @@ Each agent writes only to its own area:
 The objective bar lives in [`backend/Makefile`](backend/Makefile):
 
 ```bash
-make -C backend verify         # gofmt, go vet, golangci-lint, unit + godog, coverage
+make -C backend verify         # codegen drift, gofmt, go vet, golangci-lint, unit + godog, coverage
+make -C backend generate       # regenerate chi servers + clients from the contracts
 make -C backend contract-lint  # Spectral lint over the OpenAPI contracts
 make -C backend install-tools  # install golangci-lint (one-off)
 ```

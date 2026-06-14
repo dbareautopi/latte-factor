@@ -47,6 +47,8 @@ issues. I read and report — I never modify code.
 - Race conditions on concurrent access.
 - Domain layer depending on infrastructure (hexagonal violation).
 - Money stored/handled as `float64` (must be integer cents or decimal).
+- Hand-edited generated code (`*.gen.go`) — must come from the contract via
+  `make generate` (the drift check in `make verify` also catches this).
 
 ### Important (WARN — don't block)
 - Missing test coverage for edge cases.

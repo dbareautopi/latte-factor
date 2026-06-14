@@ -42,6 +42,9 @@ pass while following the API contract and the project's DDD Hexagonal layout.
 1. Read the inputs:
    - `specs/<feature-name>/contract/openapi.yaml`
    - `specs/<feature-name>/backend/behavior.feature` (the executable acceptance spec)
+   - The **generated** server: `backend/internal/interfaces/http/<pkg>/api.gen.go`
+     (run `make -C backend generate` if missing/stale). It defines the typed
+     `StrictServerInterface`, request/response types, `HandlerFromMux`, and a client.
    - The RED tests: co-located `*_test.go` under `backend/internal/...` and the
      godog step definitions in `backend/test/acceptance/`.
    - `backend/CLAUDE.md` for the package layout and conventions.
@@ -53,14 +56,19 @@ pass while following the API contract and the project's DDD Hexagonal layout.
    2. Repository interfaces / ports (`internal/domain/repository`)
    3. Use cases / domain services (`internal/domain/service`)
    4. Repository implementations (`internal/infrastructure/persistence`)
-   5. HTTP handlers / routes (`internal/interfaces/http`)
+   5. HTTP layer: **implement the generated `StrictServerInterface`** (don't
+      hand-write request/response types — use the generated ones), then mount it
+      with `NewStrictHandler` + `HandlerFromMux` onto a chi router.
    6. Wiring / glue (`cmd/server`, DI in constructors)
-5. Verify GREEN: `make -C backend verify` must pass (fmt, vet, golangci-lint,
-   unit + acceptance, coverage threshold). This is the definition of done.
+5. Verify GREEN: `make -C backend verify` must pass (codegen drift, fmt, vet,
+   golangci-lint, unit + acceptance, coverage). This is the definition of done.
 
 ## Code quality rules
 - Minimal code — only what the tests require; no speculative features.
-- Responses must match the OpenAPI schema exactly.
+- **Never hand-edit `*.gen.go`** (marked `DO NOT EDIT`). To change the API, edit
+  the contract and run `make -C backend generate`; conformance is enforced by the
+  compiler (strict server) and the codegen drift check in `make verify`.
+- Responses must match the OpenAPI schema exactly (the strict server enforces it).
 - Domain (`internal/domain`) depends on no other layer; inject deps via constructors.
 - Error wrapping with `fmt.Errorf("...: %w", err)`; domain errors in `domain/error`.
 - **Money as integer cents (or decimal) — never float64.**
