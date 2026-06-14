@@ -1,5 +1,7 @@
 # Latte Factor
 
+[![CI](https://github.com/dbareautopi/latte-factor/actions/workflows/ci.yml/badge.svg)](https://github.com/dbareautopi/latte-factor/actions/workflows/ci.yml)
+
 Monorepo with separate frontend and backend.
 
 ## Structure
@@ -90,6 +92,10 @@ make -C backend install-tools  # install golangci-lint (one-off)
 
 A feature is **done** when `make verify` is green. The `reviewer` runs the gate
 as evidence before any judgment review.
+
+**CI** ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs the exact same
+`make verify` + `make contract-lint` on every push and pull request, so CI and
+local stay in lockstep.
 
 ## Commit Convention
 

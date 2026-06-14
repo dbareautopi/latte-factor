@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "backend/**", "frontend/**"]
+  pull_request:
+
+# Least privilege: CI only needs to read the repo.
+permissions:
+  contents: read
+
+# A newer push on the same ref cancels the in-flight run.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend quality gate
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      # Go version is read from backend/go.mod — single source of truth.
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+
+      # Pinned for reproducibility — keep in sync with the team's local version.
+      - name: Install golangci-lint
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh \
+            | sh -s -- -b "$(go env GOPATH)/bin" v2.12.2
+
+      # Exactly what developers run locally.
+      - name: make verify
+        run: |
+          export PATH="$PATH:$(go env GOPATH)/bin"
+          make verify
+
+  contract:
+    name: OpenAPI contract lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Spectral runs via npx (see backend/Makefile contract-lint target).
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: make contract-lint
+        run: make -C backend contract-lint
