@@ -31,7 +31,7 @@ issues. I read and report — I never modify code.
    - `specs/<feature-name>/backend/behavior.feature`
    - The tests: co-located `*_test.go` and `backend/test/acceptance/`
    - Implementation under `backend/internal/`
-   - `backend/AGENTS.md` for conventions.
+   - `backend/CLAUDE.md` for conventions.
 2. Run the objective gate first, use it as evidence:
    - `make -C backend verify` (fmt, vet, golangci-lint, unit + acceptance, coverage)
    - `make -C backend contract-lint` (Spectral over the OpenAPI contract)

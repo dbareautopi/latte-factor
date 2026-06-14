@@ -8,18 +8,20 @@ Monorepo with separate frontend and backend.
 ├── frontend/          # Angular
 │   └── AGENTS.md      # Structure and conventions guide
 ├── backend/           # Go — DDD Hexagonal Architecture
-│   └── AGENTS.md      # Structure and conventions guide
+│   └── CLAUDE.md      # Stack & conventions (auto-loaded in backend/)
 ├── contracts/         # API contracts grouped by domain
 │   └── README.md      # Contract conventions
 ├── specs/             # Spec-Driven Development workspace
 │   └── README.md      # SDD workflow guide
 ├── .claude/
-│   └── agents/        # SDD subagents (source of truth for the workflow)
-│       ├── analyst.md       # Gherkin specs
-│       ├── contract-dev.md  # OpenAPI contracts
-│       ├── qa-engineer.md   # RED tests + run
-│       ├── developer.md     # Go implementation
-│       └── reviewer.md      # Code review (read-only)
+│   ├── agents/        # SDD subagents (source of truth for the workflow)
+│   │   ├── analyst.md       # Gherkin specs
+│   │   ├── contract-dev.md  # OpenAPI contracts
+│   │   ├── qa-engineer.md   # RED tests + run
+│   │   ├── developer.md     # Go implementation
+│   │   └── reviewer.md      # Code review (read-only)
+│   └── commands/      # /sdd, /sdd-next, /sdd-auto, /sdd-status
+├── CLAUDE.md          # Project-wide guidance (auto-loaded)
 └── README.md
 ```
 
@@ -104,6 +106,6 @@ Follows [Conventional Commits](https://www.conventionalcommits.org/):
 
 - [SDD Agents](.claude/agents/) — Workflow agents (source of truth)
 - [Frontend](frontend/AGENTS.md) — Angular
-- [Backend](backend/AGENTS.md) — Go DDD Hexagonal
+- [Backend](backend/CLAUDE.md) — Go DDD Hexagonal
 - [Contracts](contracts/README.md) — API contracts
 - [Specs](specs/README.md) — Spec directory

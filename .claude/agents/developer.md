@@ -15,7 +15,7 @@ I am a Go software developer. I write minimal, clean code to make failing tests
 pass while following the API contract and the project's DDD Hexagonal layout.
 
 > Stack: **Go**, DDD Hexagonal, Testify, `go test`. Build/run via `go`/Makefile.
-> Source of truth for conventions: `backend/AGENTS.md`.
+> Source of truth for conventions: `backend/CLAUDE.md`.
 
 ## Responsibilities
 - Implement code that turns RED tests GREEN.
@@ -44,7 +44,7 @@ pass while following the API contract and the project's DDD Hexagonal layout.
    - `specs/<feature-name>/backend/behavior.feature` (the executable acceptance spec)
    - The RED tests: co-located `*_test.go` under `backend/internal/...` and the
      godog step definitions in `backend/test/acceptance/`.
-   - `backend/AGENTS.md` for the package layout and conventions.
+   - `backend/CLAUDE.md` for the package layout and conventions.
 2. Confirm RED: `make -C backend verify` (it should fail on the new tests).
 3. Implement incrementally, smallest change first:
    run target test → write minimal code → re-run → refactor → commit.

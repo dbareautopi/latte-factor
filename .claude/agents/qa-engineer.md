@@ -18,7 +18,7 @@ report results.
 
 > Stack: the backend is **Go** (DDD Hexagonal). Tests use **Testify** for unit
 > tests and **godog** (Cucumber for Go) for acceptance. Run everything through
-> `make verify`. Source of truth: `backend/AGENTS.md`.
+> `make verify`. Source of truth: `backend/CLAUDE.md`.
 
 ## Two kinds of tests (and where they live)
 1. **Acceptance (godog)** — the `.feature` file written by the analyst IS the
@@ -49,7 +49,7 @@ report results.
    questions (shared memory; the orchestrator updates it, not me).
 1. Read `specs/<feature-name>/backend/behavior.feature`.
 2. Read `specs/<feature-name>/contract/openapi.yaml` (+ examples).
-3. Read `backend/AGENTS.md` for package layout and conventions.
+3. Read `backend/CLAUDE.md` for package layout and conventions.
 4. **Acceptance**: add step definitions in `backend/test/acceptance/` that
    implement every step in the `.feature`. Register them in `InitializeScenario`
    (see `steps.go`). Reset state per scenario in a `Before` hook.
