@@ -13,21 +13,13 @@ Monorepo with separate frontend and backend.
 │   └── README.md      # Contract conventions
 ├── specs/             # Spec-Driven Development workspace
 │   └── README.md      # SDD workflow guide
-├── .pi/
-│   ├── agents/        # Agent definitions (WHAT)
-│   │   ├── analyst.md
-│   │   ├── contract-dev.md
-│   │   ├── qa-engineer.md
-│   │   ├── developer.md
-│   │   └── reviewer.md
-│   ├── skills/        # Workflow steps (HOW)
-│   │   ├── create-gherkin/
-│   │   ├── create-openapi/
-│   │   ├── create-tests/
-│   │   ├── implement-code/
-│   │   └── review-code/
-│   └── extensions/
-│       └── sdd-coordinator.ts  # Orchestrator
+├── .claude/
+│   └── agents/        # SDD subagents (source of truth for the workflow)
+│       ├── analyst.md       # Gherkin specs
+│       ├── contract-dev.md  # OpenAPI contracts
+│       ├── qa-engineer.md   # RED tests + run
+│       ├── developer.md     # Go implementation
+│       └── reviewer.md      # Code review (read-only)
 └── README.md
 ```
 
@@ -41,47 +33,33 @@ Monorepo with separate frontend and backend.
 
 ## Spec-Driven Development (SDD)
 
-Two-phase workflow: interactive spec refinement, then automated implementation.
-
-### Phase 1: Interactive Spec
-
-```bash
-/sdd expense-tracking              # Start workflow
-# Chat with pi to refine your Gherkin spec
-/sdd-save <gherkin content>        # Save when ready
-```
-
-### Phase 2: Implementation (choose one)
-
-**Step-by-step** (review each phase):
-```bash
-/sdd-next              # Start
-/sdd-phase-complete    # Advance after reviewing
-```
-
-**Fully automated** (runs until failure):
-```bash
-/sdd-auto              # Runs everything automatically
-```
+The workflow runs on **Claude Code subagents** defined in [.claude/agents/](.claude/agents/).
+Each agent owns one phase and a strict write boundary. Invoke an agent by name
+(or let Claude Code auto-delegate based on the task), reviewing the output
+between phases.
 
 ### Workflow Phases
 
-1. **Spec** (interactive) → Refine Gherkin with pi
-2. **Contract Dev** (subagent) → OpenAPI from Gherkin
-3. **QA Engineer** (subagent) → Red unit + e2e tests
-4. **Developer** (subagent) → Green code
-5. **QA Engineer** (subagent) → Run tests
-6. **Reviewer** (subagent) → Code quality check
+| # | Phase | Agent | Input | Output |
+|---|-------|-------|-------|--------|
+| 1 | Spec | `analyst` | Requirements | `specs/<name>/backend/behavior.feature` |
+| 2 | Contract | `contract-dev` | Gherkin | `specs/<name>/contract/openapi.yaml` |
+| 3 | Tests (RED) | `qa-engineer` | Gherkin + contract | `specs/<name>/backend/tests/` |
+| 4 | Implementation | `developer` | Contract + tests | Code in `backend/internal/` |
+| 5 | Test run | `qa-engineer` | Tests | Pass/fail report |
+| 6 | Review | `reviewer` | Everything | Review report (read-only) |
 
-### Agents
+### Path Protection
 
-| Agent | Role |
-|-------|------|
-| analyst | Creates behavioral specifications |
-| contract-dev | Creates OpenAPI contracts |
-| qa-engineer | Creates and runs tests |
-| developer | Implements code |
-| reviewer | Reviews code quality |
+Each agent writes only to its own area:
+
+| Agent | Writes to |
+|-------|-----------|
+| analyst | `specs/<name>/backend/` |
+| contract-dev | `specs/<name>/contract/` |
+| qa-engineer | `specs/<name>/backend/tests/` |
+| developer | `backend/` |
+| reviewer | nothing (read-only) |
 
 ## Commit Convention
 
@@ -96,7 +74,7 @@ Follows [Conventional Commits](https://www.conventionalcommits.org/):
 
 ## Guides
 
-- [SDD Workflow](.pi/SDD.md) — Full documentation
+- [SDD Agents](.claude/agents/) — Workflow agents (source of truth)
 - [Frontend](frontend/AGENTS.md) — Angular
 - [Backend](backend/AGENTS.md) — Go DDD Hexagonal
 - [Contracts](contracts/README.md) — API contracts
